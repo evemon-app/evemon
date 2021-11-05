@@ -496,12 +496,6 @@
     <value>/v2/universe/stations/{0}/</value>
     <comment>300</comment>
   </data>
-  <data name="SSOBase" xml:space="preserve">
-    <value>https://login.eveonline.com/oauth/</value>
-  </data>
-  <data name="SSOCharID" xml:space="preserve">
-    <value>verify</value>
-  </data>
   <data name="SSOLogin" xml:space="preserve">
     <value>authorize/?response_type=code&amp;redirect_uri={0}&amp;client_id={3}&amp;scope={2}&amp;state={1}</value>
   </data>

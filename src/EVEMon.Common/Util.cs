@@ -1152,6 +1152,20 @@ namespace EVEMon.Common
                 Replace("=", "");
         }
 
+        public static byte[] FromURLSafeBase64(string data)
+        {
+            data = data
+                .Replace('-', '+')
+                .Replace('_', '/');
+
+            while (data.Length % 4 != 0)
+            {
+                data += "=";
+            }
+
+            return Convert.FromBase64String(data);
+        }
+
         /// <summary>
         /// Computes the Base-64 URL safe SHA-256 hash of the data.
         /// </summary>
