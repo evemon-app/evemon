@@ -1222,29 +1222,11 @@ namespace EVEMon.Common.Constants {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to https://login.eveonline.com/oauth/.
-        /// </summary>
-        public static string SSOBase {
-            get {
-                return ResourceManager.GetString("SSOBase", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to https://login.eveonline.com/v2/oauth/.
         /// </summary>
         public static string SSOBaseV2 {
             get {
                 return ResourceManager.GetString("SSOBaseV2", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to verify.
-        /// </summary>
-        public static string SSOCharID {
-            get {
-                return ResourceManager.GetString("SSOCharID", resourceCulture);
             }
         }
         

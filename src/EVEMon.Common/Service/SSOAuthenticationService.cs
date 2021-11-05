@@ -49,15 +49,29 @@ namespace EVEMon.Common.Service
         public static void GetTokenInfo(string token, Action<JsonResult<EsiAPITokenInfo>>
             callback)
         {
-            var url = new Uri(NetworkConstants.SSOBase + NetworkConstants.SSOCharID);
-            Util.DownloadJsonAsync<EsiAPITokenInfo>(url, new RequestParams()
+            // Split the token into 3 parts
+            string[] tokenParts = token.Split('.');
+
+            // Extract the payload and decode it from base64
+            string tokenPayload = Encoding.UTF8.GetString(Util.FromURLSafeBase64(tokenParts[1]));
+
+            // Decode the payload into a json object
+            EsiTokenPayload payload = Util.DeserializeJson<EsiTokenPayload>(tokenPayload);
+
+            // Create the EsiAPITokenInfo object from the payload
+            EsiAPITokenInfo info = new EsiAPITokenInfo
             {
-                Authentication = token
-            }).ContinueWith((result) => Dispatcher.Invoke(() =>
-            {
-                // Run the callback on the dispatcher thread
-                callback?.Invoke(result.Result);
-            }));
+                // Copy relevant fields across
+                CharacterID = Convert.ToInt64(payload.CharacterID),
+                CharacterName = payload.CharacterName,
+                ExpiresOnString = payload.ExpiresOnString,
+            };
+
+            // Wrap the token info object in a JsonResult
+            JsonResult<EsiAPITokenInfo> result = new JsonResult<EsiAPITokenInfo>(new ResponseParams(200), info);
+
+            // Fire the callback
+            callback?.Invoke(result);
         }
 
         /// <summary>
@@ -298,5 +312,42 @@ namespace EVEMon.Common.Service
             RefreshToken = string.Empty;
             Obtained = DateTime.UtcNow;
         }
+    }
+
+    /// <summary>
+    /// Template class for the payload of the ESI Access Token Payload.
+    /// </summary>
+    [DataContract]
+    public sealed class EsiTokenPayload
+    {
+        [DataMember(Name = "sub")]
+        private string Subject { get; set; }
+
+        [IgnoreDataMember]
+        public string CharacterID => Subject.Replace("CHARACTER:EVE:", "");
+
+        [DataMember(Name = "name")]
+        public string CharacterName { get; set; }
+
+        [DataMember(Name = "scp")]
+        public string[] Scopes { get; set; }
+
+        [DataMember(Name = "owner")]
+        public string OwnerHash { get; set; }
+
+        [DataMember(Name = "tenant")]
+        public string Tenant { get; set; }
+
+        [DataMember(Name = "tier")]
+        public string Tier { get; set; }
+
+        [DataMember(Name = "world")]
+        public string World { get; set; }
+
+        [DataMember(Name = "exp")]
+        public int ExpiresOn { get; set; }
+
+        [IgnoreDataMember]
+        public string ExpiresOnString => DateTimeOffset.FromUnixTimeSeconds(ExpiresOn).ToString();
     }
 }
